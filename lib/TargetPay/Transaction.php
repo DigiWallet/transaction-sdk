@@ -7,184 +7,184 @@ use TargetPay\StartResponse;
 use TargetPay\CheckResponse;
 
 /**
- *	TargetPay transaction SDK - Abstract base class
+ *  TargetPay transaction SDK - Abstract base class
  * 
- * 	@author	 	Yellow Melon B.V.
- * 	@release	26-10-2014
- * 	@ver		1.0
+ *  @author     Yellow Melon B.V.
+ *  @release    26-10-2014
+ *  @ver        1.0
  */
 
 abstract class Transaction 
-	{
+    {
 
-	/**
-	 * Salt to use
-	 */
+    /**
+     * Salt to use
+     */
 
-	const SALT = '932kvm8937*#&1nj_aa9873j0a0987'; 
+    const SALT = '932kvm8937*#&1nj_aa9873j0a0987'; 
 
-	/**
-	 * Official name
-	 */
+    /**
+     * Official name
+     */
 
-	protected $name = null;					
+    protected $name = null;                 
 
-	/**
-	 * Payment method ID
-	 */
+    /**
+     * Payment method ID
+     */
 
-	protected $method = null;				
+    protected $method = null;               
 
-	/**
-	 * Check API URL
-	 */
+    /**
+     * Check API URL
+     */
 
-	protected $checkApi = null;				
+    protected $checkApi = null;             
 
-	/**
-	 * Official name
-	 */
+    /**
+     * Official name
+     */
 
-	protected $minimumAmount = 84; 	
+    protected $minimumAmount = 84;  
 
-	/**
-	 * Minimum amount
-	 */
+    /**
+     * Minimum amount
+     */
 
-	protected $maximumAmount = 1000000;		
+    protected $maximumAmount = 1000000;     
 
-	/**
-	 *	Currencies available, first is default
-	 */
+    /**
+     *  Currencies available, first is default
+     */
 
-	protected $currencies = array('EUR');		
+    protected $currencies = array('EUR');       
 
-	/**
-	 *	Languages available, first is default
-	 */
+    /**
+     *  Languages available, first is default
+     */
 
-    protected $languages = array('nl');		
+    protected $languages = array('nl');     
 
-	/**
-	 *	TargetPay layoutcode
-	 */
+    /**
+     *  TargetPay layoutcode
+     */
 
-	protected $rtlo = null;
+    protected $rtlo = null;
 
-	/**
-	 *	Test mode on/off
-	 */
+    /**
+     *  Test mode on/off
+     */
 
-	protected $test = false;
+    protected $test = false;
 
-	/**
-	 *	Language, will be set to the default for the payment method if not explicitly defined
-	 */
+    /**
+     *  Language, will be set to the default for the payment method if not explicitly defined
+     */
 
-    protected $language	= null;	
+    protected $language = null; 
 
-	/**
-	 *	Default currency, will be set to the default for the payment method if not explicitly defined
-	 */
+    /**
+     *  Default currency, will be set to the default for the payment method if not explicitly defined
+     */
 
-    protected $currency	= null;	
+    protected $currency = null; 
 
-	/**
-	 *	Application ID
-	 */
+    /**
+     *  Application ID
+     */
 
-	protected $appId = '3087f78657faca499cf526ae90340948'; 
+    protected $appId = '3087f78657faca499cf526ae90340948'; 
 
-	/**
-	 *	Amount in Eurocents 
-	 */
+    /**
+     *  Amount in Eurocents 
+     */
 
-	protected $amount = 0;		
+    protected $amount = 0;      
 
-	/**
-	 *	Description for bank statement
-	 */
+    /**
+     *  Description for bank statement
+     */
 
-	protected $description = null;	
+    protected $description = null;  
 
-	/**
-	 *	Return URL
-	 */
+    /**
+     *  Return URL
+     */
 
-	protected $returnUrl = null;		
+    protected $returnUrl = null;        
 
-	/**
-	 *	Cancel URL
-	 */
+    /**
+     *  Cancel URL
+     */
 
-	protected $cancelUrl = null;		
+    protected $cancelUrl = null;        
 
-	/**
-	 *	Report URL
-	 */
+    /**
+     *  Report URL
+     */
 
-	protected $reportUrl = null;		
+    protected $reportUrl = null;        
 
-	/**
-	 *	Transaction ID
-	 */
+    /**
+     *  Transaction ID
+     */
 
-	protected $txid = null;		
+    protected $txid = null;     
 
-	/**
-	 *	Called before start call so additional parameters can be added to the request
-	 *  May be implemented by specfic payment method where needed
-	 */
+    /**
+     *  Called before start call so additional parameters can be added to the request
+     *  May be implemented by specfic payment method where needed
+     */
 
-	public function beforeStart($request) {}
+    public function beforeStart($request) {}
 
-	/**
-	 *	Called after start to process http request to a response
-	 */
+    /**
+     *  Called after start to process http request to a response
+     */
 
-	public function parseStartResponse($httpResponse) 
-	{
+    public function parseStartResponse($httpResponse) 
+    {
         if (substr($httpResponse, 0, 6)=="000000") {
             $httpResponse = explode("|", substr($httpResponse, 7));
             $this->txid = $httpResponse[0]; // For immediate reuse of the object
             return new StartResponse(array("status" => true, "txid" => $httpResponse[0], "url" => $httpResponse[1]));
- 		} else {
- 			return new StartResponse(array("status" => false, "error" => $httpResponse));
-		}
-	}
+        } else {
+            return new StartResponse(array("status" => false, "error" => $httpResponse));
+        }
+    }
 
     /**
-	 *  Start transaction at TargetPay
-	 */
+     *  Start transaction at TargetPay
+     */
 
-	public function start () 
-	{
-		if (!$this->amount) throw new Exception ("No amount given");
+    public function start () 
+    {
+        if (!$this->amount) throw new Exception ("No amount given");
         if ($this->amount < $this->minimumAmount) throw new Exception ("Amount is too low: minimum=" . $this->minimumAmount);
         if ($this->amount > $this->maximumAmount) throw new Exception ("Amount is too high: maximum=" . $this->maximumAmount);
       
-      	// Create request object
-      	$request = new Request("https://www.targetpay.com/api/idealplugins");
+        // Create request object
+        $request = new Request("https://www.targetpay.com/api/idealplugins");
 
-      	// Fill it up
+        // Fill it up
         $request->bind (
-        	array(
-	        	"paymethod" => $this->method,
-				"rtlo" => $this->rtlo,
-		        "amount" => $this->amount,
-	        	"description" => $this->description, 
-	        	"reporturl" => $this->reportUrl,
-	        	"returnurl" => $this->returnUrl,
-		        "cancelurl" => $this->cancelUrl,
-			    "app_id" => $this->appId,
-			    "language" => ($this->language) ? $this->language : $this->languages[0],
-			    "lang" => ($this->language) ? $this->language : $this->languages[0],
-			    "currency" => ($this->currency) ? $this->currency : $this->currencies[0],
-	        	"userip" => (isset($_SERVER["REMOTE_ADDR"]) ? $_SERVER["REMOTE_ADDR"] : "cli"),
-	        	"domain" => (isset($_SERVER["REMOTE_ADDR"]) ? $_SERVER["HTTP_HOST"] : "cli"),
-	        	"salt" => self::SALT
-	        )
-		);
+            array(
+                "paymethod" => $this->method,
+                "rtlo" => $this->rtlo,
+                "amount" => $this->amount,
+                "description" => $this->description, 
+                "reporturl" => $this->reportUrl,
+                "returnurl" => $this->returnUrl,
+                "cancelurl" => $this->cancelUrl,
+                "app_id" => $this->appId,
+                "language" => ($this->language) ? $this->language : $this->languages[0],
+                "lang" => ($this->language) ? $this->language : $this->languages[0],
+                "currency" => ($this->currency) ? $this->currency : $this->currencies[0],
+                "userip" => (isset($_SERVER["REMOTE_ADDR"]) ? $_SERVER["REMOTE_ADDR"] : "cli"),
+                "domain" => (isset($_SERVER["REMOTE_ADDR"]) ? $_SERVER["HTTP_HOST"] : "cli"),
+                "salt" => self::SALT
+            )
+        );
 
         // Invoke on before start event
         $this->beforeStart($request);
@@ -194,197 +194,197 @@ abstract class Transaction
 
         // Make start response object and return it
         return $this->parseStartResponse ($httpResponse);
-	}
-
-	/**
-	 *	Called after check to process http request to a response
-	 */
-
-	public function parseCheckResponse($httpResponse) 
-	{
-		if (substr($httpResponse,0,6) == "000000") {
-			$info = explode("|", $httpResponse);
-			return new CheckResponse(
-				array(
-					"status" => true,
-					"name" => (isset($info[1]) ? $info[1] : null),
-					"iban" => (isset($info[2]) ? $info[2] : null)
-				)
-			);
-		} else {
-			return new CheckResponse(array("status" => false, "error" => $httpResponse));
-		}
-	}	
+    }
 
     /**
-	 *	Check transaction with TargetPay
+     *  Called after check to process http request to a response
+     */
+
+    public function parseCheckResponse($httpResponse) 
+    {
+        if (substr($httpResponse,0,6) == "000000") {
+            $info = explode("|", $httpResponse);
+            return new CheckResponse(
+                array(
+                    "status" => true,
+                    "name" => (isset($info[1]) ? $info[1] : null),
+                    "iban" => (isset($info[2]) ? $info[2] : null)
+                )
+            );
+        } else {
+            return new CheckResponse(array("status" => false, "error" => $httpResponse));
+        }
+    }   
+
+    /**
+     *  Check transaction with TargetPay
      */
 
     public function check () 
     {
-      	// Create request object
-      	$request = new Request($this->checkApi);
-      	
-      	// Fill it up
-		$request->bind(
-			array(
-				"rtlo" => $this->rtlo,
-				"trxid" => $this->txid,
-				"test" => $this->test,
-				"checksum" => md5($this->txid . $this->rtlo . self::SALT)
-			)
-		);
+        // Create request object
+        $request = new Request($this->checkApi);
+        
+        // Fill it up
+        $request->bind(
+            array(
+                "rtlo" => $this->rtlo,
+                "trxid" => $this->txid,
+                "test" => $this->test,
+                "checksum" => md5($this->txid . $this->rtlo . self::SALT)
+            )
+        );
 
-		// Run check
-		$httpResponse = $request->execute();
+        // Run check
+        $httpResponse = $request->execute();
 
         // Make check response object and return it
-        return $this->parseCheckResponse ($httpResponse);		
+        return $this->parseCheckResponse ($httpResponse);       
     }
 
-	/**
-	 * 	Get method code
-	 */
+    /**
+     *  Get method code
+     */
 
-	public function getMethod()
-	{
-		return $this->method;
-	}
+    public function getMethod()
+    {
+        return $this->method;
+    }
 
-	/**
-	 *	Set the amount, as of now it is always in cents [start]
-	 *  @param int $amount
-	 */
+    /**
+     *  Set the amount, as of now it is always in cents [start]
+     *  @param int $amount
+     */
 
-	public function amount ($amount)
-	{
-    	$this->amount = round($amount);
-		return $this;
-	}
+    public function amount ($amount)
+    {
+        $this->amount = round($amount);
+        return $this;
+    }
 
-	/**
-	 *	Set the app ID [start, check]
-	 *  @param string $appId
-	 */
+    /**
+     *  Set the app ID [start, check]
+     *  @param string $appId
+     */
 
-	public function appId ($appId)
-	{
-		$this->appId = strtolower(preg_replace("/[^a-z\d_]/i", "", $appId));
-		return $this;
-	}
+    public function appId ($appId)
+    {
+        $this->appId = strtolower(preg_replace("/[^a-z\d_]/i", "", $appId));
+        return $this;
+    }
 
-	/**
-	 *	Set the currency. See documentation for available currencies [start]
-	 *  @param string $currency
-	 */
+    /**
+     *  Set the currency. See documentation for available currencies [start]
+     *  @param string $currency
+     */
 
-	public function currency ($currency) 
-	{
-		if (in_array($currency, $this->currencies)) {
-			$this->currency = $currency;
-		}
-		return $this;
-	}
+    public function currency ($currency) 
+    {
+        if (in_array($currency, $this->currencies)) {
+            $this->currency = $currency;
+        }
+        return $this;
+    }
 
-	/**
-	 *	Set description for on the banking statement [start]
-	 *  @param string $description
-	 */
+    /**
+     *  Set description for on the banking statement [start]
+     *  @param string $description
+     */
 
-	public function description ($description) 
-	{
-    	$this->description = substr($description, 0, 32);
-		return $this;
-	}
+    public function description ($description) 
+    {
+        $this->description = substr($description, 0, 32);
+        return $this;
+    }
 
-	/**
-	 *	Set the language [start]
-	 *  @param string $language
-	 */
+    /**
+     *  Set the language [start]
+     *  @param string $language
+     */
 
-	public function language ($language)
-	{
-		if (in_array($language, $this->languages)) {
-			$this->language = $language;
-		}
-		return $this;
-	}
+    public function language ($language)
+    {
+        if (in_array($language, $this->languages)) {
+            $this->language = $language;
+        }
+        return $this;
+    }
 
-	/**
-	 *	Set the report URL [start]
-	 *  @param string $reportUrl
-	 */
+    /**
+     *  Set the report URL [start]
+     *  @param string $reportUrl
+     */
 
-	public function reportUrl ($reportUrl) 
-	{
-		if (preg_match('|(\w+)://([^/:]+)(:\d+)?(.*)|', $reportUrl)) $this->reportUrl = $reportUrl;
-		return $this;
-	}
+    public function reportUrl ($reportUrl) 
+    {
+        if (preg_match('|(\w+)://([^/:]+)(:\d+)?(.*)|', $reportUrl)) $this->reportUrl = $reportUrl;
+        return $this;
+    }
 
-	/**
-	 *	Set the return URL [start]
-	 *  @param string $reportUrl
-	 */
+    /**
+     *  Set the return URL [start]
+     *  @param string $reportUrl
+     */
 
-	public function returnUrl ($returnUrl) 
-	{
-		if (preg_match('|(\w+)://([^/:]+)(:\d+)?(.*)|', $returnUrl)) $this->returnUrl = $returnUrl;
-		return $this;
-	}
+    public function returnUrl ($returnUrl) 
+    {
+        if (preg_match('|(\w+)://([^/:]+)(:\d+)?(.*)|', $returnUrl)) $this->returnUrl = $returnUrl;
+        return $this;
+    }
 
-	/**
-	 *	Set the cancel URL [start]
-	 *  @param string $cancelUrl
-	 */
+    /**
+     *  Set the cancel URL [start]
+     *  @param string $cancelUrl
+     */
 
-	public function cancelUrl ($cancelUrl) 
-	{
-		if (preg_match('|(\w+)://([^/:]+)(:\d+)?(.*)|', $cancelUrl)) $this->cancelUrl = $cancelUrl;
-		return $this;
-	}
+    public function cancelUrl ($cancelUrl) 
+    {
+        if (preg_match('|(\w+)://([^/:]+)(:\d+)?(.*)|', $cancelUrl)) $this->cancelUrl = $cancelUrl;
+        return $this;
+    }
 
-	/**
-	 *	Set the layoutcode [start, check]
-	 *  @param int $rtlo
-	 */
+    /**
+     *  Set the layoutcode [start, check]
+     *  @param int $rtlo
+     */
 
-	public function rtlo ($rtlo)
-	{
-		$this->rtlo = $rtlo;
-		return $this;
-	}
+    public function rtlo ($rtlo)
+    {
+        $this->rtlo = $rtlo;
+        return $this;
+    }
 
-	/**
-	 *	Enable/disable testmode [check]
-	 *  @param bool $test
-	 */
+    /**
+     *  Enable/disable testmode [check]
+     *  @param bool $test
+     */
 
-	public function test ($test)
-	{
-		$this->test = (bool) $test;
-		return $this;
-	}
+    public function test ($test)
+    {
+        $this->test = (bool) $test;
+        return $this;
+    }
 
-	/**
-	 *	Set transaction ID [check]
-	 *  @param string $txid
-	 */
+    /**
+     *  Set transaction ID [check]
+     *  @param string $txid
+     */
 
-	public function txid ($txid) 
-	{
+    public function txid ($txid) 
+    {
         $this->txid = substr($txid, 0, 32);
-		return $this;
-	}
+        return $this;
+    }
 
-	/**
-	 *	Provide static instance of a payment model based on its class name
-	 *	@param string $method Class name of the method, e.g. Ideal
-	 */
+    /**
+     *  Provide static instance of a payment model based on its class name
+     *  @param string $method Class name of the method, e.g. Ideal
+     */
 
-	public static function model($method)
-	{
-		$class = '\\TargetPay\\Methods_'.$method;
-		return new $class;
-	}
+    public static function model($method)
+    {
+        $class = '\\TargetPay\\Methods_'.$method;
+        return new $class;
+    }
 
 }
