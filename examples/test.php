@@ -1,67 +1,63 @@
 #!/usr/bin/env php
 <?php
-require_once __DIR__.'/../lib/TargetPay/autoload.php';
 
-use \TargetPay as TargetPay;
+require_once __DIR__ . '/../lib/DigiWallet/autoload.php';
 
 /**
- *  Function to test TargetPay calls for the various payment methods
+ *  Function to test DigiWallet calls for the various payment methods
  *  Test parameters
- *  - rtlo                  121455 (change this!)
+ *  - outletId              143835 (change this and make sure your outlet is running in test-mode!)
  *  - description           Test payment
- *  - bank for iDEAL        0021 (Rabobank)
- *  - country for Sofort    49 (Germany)
+ *  - bank for iDEAL        RABONL2U (Rabobank)
+ *  - country for Sofort    DE (Germany)
  *  - ...
  *
  *  After payment start, the payment is checked
  */
-
-function test ($method) 
+function test($method)
 {
     echo "------------------------------------------------------------------------------\n";
     echo "$method : ";
 
     // Start payment
 
-    $startPayment = TargetPay\Transaction::model($method)
-        ->rtlo(121455)
+    $startPayment = DigiWallet\Transaction::model($method)
+        ->outletId(143835)
         ->amount(1000)
         ->description('Test payment')
         ->returnUrl('http://www.test.nl/success')
         ->cancelUrl('http://www.test.nl/canceled')
         ->reportUrl('http://www.test.nl/report');
 
-    if ($method=="Ideal") { $startPayment->bank('0021'); }
-    if ($method=="Sofort") { $startPayment->country(49); }
+    if ($method == "Ideal") {
+        $startPayment->bank('RABONL2U');
+    }
+    if ($method == "Sofort") {
+        $startPayment->country('DE');
+    }
 
     $startPaymentResult = $startPayment->start();
 
-    // Succesful payment start
-
     if ($startPaymentResult->status) {
+        // Successful payment start, call check API
+        echo $startPaymentResult->url . " => ";
 
-        // Check payment
-        echo $startPaymentResult->url." => ";
-
-        $checkPaymentResult = TargetPay\Transaction::model($method)
-            ->rtlo(121455)
-            ->txid($startPaymentResult->txid)
-            ->test(true)
+        $checkPaymentResult = DigiWallet\Transaction::model($method)
+            ->outletId(143835)
+            ->transactionId($startPaymentResult->transactionId)
             ->check();
 
         echo ($checkPaymentResult->status) ? "OK" : "fail";
         echo "\n";
-
     } else {
-
-        // Unsuccesful
+        // Unsuccessful
         echo $startPaymentResult->error;
         echo "\n";
     }
 }
 
-test ("Ideal");
-test ("MisterCash");
-test ("Sofort");
-test ("Creditcard");
-test ("Paysafecard");
+test("Ideal");
+test("Bancontact");
+test("Sofort");
+test("Creditcard");
+test("Paysafecard");

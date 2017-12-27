@@ -1,19 +1,19 @@
 <?php
-namespace TargetPay;
+namespace DigiWallet;
 
 /**
- *  TargetPay autoloader
- * 
+ *  DigiWallet autoloader
+ *
  *  Only use this if no global autoloader is present and can be used
  *  Usage:
  *
- *     require_once "<path-to-here>/Dropbox/autoload.php"
+ *     require_once "<path-to-here>/DigiWallet/autoload.php"
+ * @param $name
  */
-
 function autoload($name)
 {
-    // Check if this is a TargetPay class
-    if (\substr_compare($name, "TargetPay\\", 0, 10) !== 0) return;
+    // Check if this is a DigiWallet class
+    if (\substr_compare($name, "DigiWallet\\", 0, 10) !== 0) return;
 
     // Remove namespace from class name
     $stem = \substr($name, 10);
@@ -25,4 +25,4 @@ function autoload($name)
     if (\is_file($path)) require_once $path;
 }
 
-\spl_autoload_register('TargetPay\autoload');
+\spl_autoload_register('DigiWallet\autoload');
