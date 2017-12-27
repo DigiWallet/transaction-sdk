@@ -61,3 +61,4 @@ test("Bancontact");
 test("Sofort");
 test("Creditcard");
 test("Paysafecard");
+test("Paypal");

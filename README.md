@@ -75,7 +75,8 @@ Currently the following payment methods are implemented. See their classes (in p
 - Bancontact/Mister Cash (Bancontact)
 - Sofort Banking (Sofort)
 - Paysafecard (PaysafeCard)
-- Visa/Mastercard/AMEX (CreditCard)
+- PayPal (Paypal)
+- Visa/Mastercard/AMEX (Creditcard)
 
 Notes
 =====

@@ -4,6 +4,7 @@ namespace DigiWallet;
 use DigiWallet\Methods\Bancontact;
 use DigiWallet\Methods\Creditcard;
 use DigiWallet\Methods\Ideal;
+use DigiWallet\Methods\Paypal;
 use DigiWallet\Methods\Paysafecard;
 use DigiWallet\Methods\Sofort;
 
@@ -306,7 +307,7 @@ abstract class Transaction
     /**
      * Provide static instance of a payment model based on its class name
      * @param string $method Class name of the method, e.g. Ideal
-     * @return Bancontact|Creditcard|Ideal|Paysafecard|Sofort
+     * @return Bancontact|Creditcard|Ideal|Paysafecard|Sofort|Paypal
      */
     public static function model($method)
     {
