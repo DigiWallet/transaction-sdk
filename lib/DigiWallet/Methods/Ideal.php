@@ -32,7 +32,7 @@ class Ideal extends Transaction
     protected $maximumAmount = 1000000;
     protected $currencies = ['EUR'];
     protected $languages = ['nl'];
-    protected $bank = null;
+    protected $bank;
     protected $version = 4;
 
     /**

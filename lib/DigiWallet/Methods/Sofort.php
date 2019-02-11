@@ -32,7 +32,7 @@ class Sofort extends Transaction
     protected $minimumAmount = 10;
     protected $maximumAmount = 500000;
     protected $languages = ['de', 'en', 'nl'];
-    protected $country = null;
+    protected $country;
     protected $type = 1;
     protected $version = 2;
 

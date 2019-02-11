@@ -77,6 +77,7 @@ Currently the following payment methods are implemented. See their classes (in p
 - Paysafecard (PaysafeCard)
 - PayPal (Paypal)
 - Visa/Mastercard/AMEX (Creditcard)
+- AfterPay (Afterpay)
 
 Notes
 =====

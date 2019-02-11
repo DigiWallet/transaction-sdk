@@ -1,12 +1,14 @@
 <?php
 
 namespace DigiWallet;
+use DigiWallet\Methods\Afterpay;
 use DigiWallet\Methods\Bancontact;
 use DigiWallet\Methods\Creditcard;
 use DigiWallet\Methods\Ideal;
 use DigiWallet\Methods\Paypal;
 use DigiWallet\Methods\Paysafecard;
 use DigiWallet\Methods\Sofort;
+use function is_bool;
 
 /**
  *  DigiWallet transaction SDK - Abstract base class
@@ -34,29 +36,31 @@ use DigiWallet\Methods\Sofort;
  * @property $reportUrl string URL location where to send server-to-server callbacks about the transaction statuses
  * @property $transactionId string The identifier of the transaction
  * @property $version integer API version
+ * @property $test bool Whether to use the DigiWallet Test Panel or not
  */
 abstract class Transaction
 {
     protected $salt = '932kvm8937*#&1nj_aa9873j0a0987';
-    protected $name = null;
-    protected $method = null;
-    protected $startApi = null;
-    protected $checkApi = null;
+    protected $name;
+    protected $method;
+    protected $startApi;
+    protected $checkApi;
     protected $minimumAmount = 84;
     protected $maximumAmount = 1000000;
     protected $currencies = ['EUR'];
     protected $languages = ['NL'];
-    protected $outletId = null;
-    protected $language = null;
-    protected $currency = null;
+    protected $outletId;
+    protected $language;
+    protected $currency;
     protected $appId = 'dw_example_sdk_1.0';
     protected $amount = 0;
-    protected $description = null;
-    protected $returnUrl = null;
-    protected $cancelUrl = null;
-    protected $reportUrl = null;
-    protected $transactionId = null;
-    protected $version = null;
+    protected $description;
+    protected $returnUrl;
+    protected $cancelUrl;
+    protected $reportUrl;
+    protected $transactionId;
+    protected $version;
+    protected $test;
 
     /**
      * Called before start call so additional parameters can be added to the request
@@ -74,7 +78,7 @@ abstract class Transaction
      */
     public function parseStartResponse($httpResponse)
     {
-        if (substr($httpResponse, 0, 6) == '000000') {
+        if (strpos($httpResponse, '000000') === 0) {
             $httpResponse = explode('|', substr($httpResponse, 7));
             $this->transactionId = $httpResponse[0]; // For immediate reuse of the object
 
@@ -110,13 +114,14 @@ abstract class Transaction
             'returnurl' => $this->returnUrl,
             'cancelurl' => $this->cancelUrl,
             'app_id' => $this->appId,
-            'language' => ($this->language) ? $this->language : $this->languages[0],
-            'lang' => ($this->language) ? $this->language : $this->languages[0],
-            'currency' => ($this->currency) ? $this->currency : $this->currencies[0],
-            'userip' => (isset($_SERVER['REMOTE_ADDR']) ? $_SERVER['REMOTE_ADDR'] : 'cli'),
-            'domain' => (isset($_SERVER['REMOTE_ADDR']) ? $_SERVER['HTTP_HOST'] : 'cli'),
+            'language' => $this->language ? $this->language : $this->languages[0],
+            'lang' => $this->language ? $this->language : $this->languages[0],
+            'currency' => $this->currency ? $this->currency : $this->currencies[0],
+            'userip' => isset($_SERVER['REMOTE_ADDR']) ? $_SERVER['REMOTE_ADDR'] : '127.0.0.1',
+            'domain' => isset($_SERVER['HTTP_HOST']) ? $_SERVER['HTTP_HOST'] : 'http://www.lepel.nl',
             'salt' => $this->salt,
             'ver' => $this->version,
+            'test' => (int)$this->test
         ]);
 
         // Invoke on before start event
@@ -136,7 +141,7 @@ abstract class Transaction
      */
     public function parseCheckResponse($httpResponse)
     {
-        if (substr($httpResponse, 0, 6) == '000000') {
+        if (strpos($httpResponse, '000000') === 0) {
             return new CheckResponse(['status' => true]);
         }
 
@@ -155,7 +160,8 @@ abstract class Transaction
         $request->bind([
             'rtlo' => $this->outletId,
             'trxid' => $this->transactionId,
-            'checksum' => md5($this->transactionId . $this->outletId . $this->salt)
+            'checksum' => md5($this->transactionId . $this->outletId . $this->salt),
+            'test' => (int)$this->test
         ]);
 
         // Run check
@@ -231,7 +237,7 @@ abstract class Transaction
      */
     public function language($language)
     {
-        if (in_array($language, $this->languages)) {
+        if (in_array($language, $this->languages, true)) {
             $this->language = $language;
         }
 
@@ -305,9 +311,22 @@ abstract class Transaction
     }
 
     /**
+     * Set test-mode [start, check]
+     * @param $test
+     * @return $this
+     */
+    public function test($test) {
+        if (is_bool($test)) {
+            $this->test = $test;
+        }
+
+        return $this;
+    }
+
+    /**
      * Provide static instance of a payment model based on its class name
      * @param string $method Class name of the method, e.g. Ideal
-     * @return Bancontact|Creditcard|Ideal|Paysafecard|Sofort|Paypal
+     * @return Bancontact|Creditcard|Ideal|Paysafecard|Sofort|Paypal|Afterpay
      */
     public static function model($method)
     {

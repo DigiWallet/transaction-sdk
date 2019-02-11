@@ -1,19 +1,28 @@
 {
-    "name": "yellowmelon/targetpay",
+    "name": "DigiWallet/transaction-sdk",
     "type": "library",
-    "description": "TargetPay PHP SDK",
-    "keywords": ["ideal","mistercash","sofort","payments","psp","targetpay"],
+    "description": "DigiWallet Bank Payments PHP SDK",
+    "keywords": [
+        "afterpay",
+        "ideal",
+        "mistercash", "bancontact",
+        "sofort", "klarna",
+        "paysafecard", "paysafe",
+        "paypal",
+        "creditcard", "visa", "mastercard", "amex",
+        "payments", "psp", "targetpay", "digiwallet"
+    ],
     "license": "GPL-2.0+",
     "authors": [
         {
-            "name": "Erwin van den Boom",
-            "email": "erwin@yellowmelon.nl",
-            "homepage": "https://www.facebook.com/bamikanarie",
+            "name": "DigiWallet",
+            "email": "development@targetmedia.eu",
+            "homepage": "https://www.targetmedia.eu",
             "role": "Developer"
         }
     ],
     "support": {
-        "email": "support@yellowmelon.nl"
+        "email": "techsupport@targetmedia.eu"
     },    
     "require": {
         "php": ">=5.3.0"

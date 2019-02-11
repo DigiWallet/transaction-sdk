@@ -35,7 +35,7 @@ class Request
      * Bind parameter or a array of parameters
      *
      * @param mixed $fields Fieldname or array
-     * @param mixed $value It's new value (may be omitted in use of array)
+     * @param mixed $value Its new value (may be omitted in use of array)
      * @return $this
      */
     public function bind($fields, $value = null)
