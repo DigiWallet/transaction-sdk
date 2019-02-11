@@ -1,5 +1,5 @@
 {
-    "name": "DigiWallet/transaction-sdk",
+    "name": "digiwallet/transaction-sdk",
     "type": "library",
     "description": "DigiWallet Bank Payments PHP SDK",
     "keywords": [
